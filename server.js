@@ -12,3 +12,18 @@ app.get('/', function(req, res) {
 app.listen(3000, function() {
   console.info('Running on port 3000');
 });
+
+app.use((err, req, res, next) => {
+  switch (err.message) {
+    case 'NoCodeProvided':
+      return res.status(400).send({
+        status: 'ERROR',
+        error: err.message,
+      });
+    default:
+      return res.status(500).send({
+        status: 'ERROR',
+        error: err.message,
+      });
+  }
+});
