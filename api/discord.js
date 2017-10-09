@@ -1,8 +1,9 @@
 const express = require('express');
 const fetch = require('node-fetch');
 const btoa = require('btoa');
-const catchAsync = require('../utils');
+// const catchAsync = require('../utils');
 
+var token = '';
 const router = express.Router();
 
 const CLIENT_ID = process.env.CLIENT_ID;
@@ -14,8 +15,9 @@ router.get('/login', function(req, res) {
   res.redirect(`https://discordapp.com/oauth2/authorize?client_id=${CLIENT_ID}&scope=identify&response_type=code&redirect_uri=${redirect}`);
 });
 
-router.get('/callback', catchAsync(async (req, res) => {
-  if (!req.query.code) throw new Error('NoCodeProvided');
+router.get('/callback', (async (req, res) => {
+  // if (!req.query.code) throw new Error('NoCodeProvided');
+
   const code = req.query.code;
   const creds = btoa(`${CLIENT_ID}:${CLIENT_SECRET}`);
   const response = await fetch(`https://discordapp.com/api/oauth2/token?grant_type=authorization_code&code=${code}&redirect_uri=${redirect}`,
@@ -26,9 +28,12 @@ router.get('/callback', catchAsync(async (req, res) => {
       },
     });
   const json = await response.json();
+  console.log(json);
   res.redirect(`/?token=${json.access_token}`);
+  token = json.access_token;
 }));
 module.exports = router;
+
 
 
 // Client ID: 366591494775373825
